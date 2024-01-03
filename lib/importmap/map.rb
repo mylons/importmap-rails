@@ -141,7 +141,14 @@ class Importmap::Map
     end
 
     def module_name_from(filename, mapping)
-      [ mapping.under, filename.to_s.remove(filename.extname).remove(/\/?index$/).presence ].compact.join("/")
+      [
+        mapping.under,
+        if filename.to_s == 'index.js'
+          ''
+        else
+          filename.to_s.remove(filename.extname).remove(/\/index$/)  # Original logic
+        end.presence
+      ].compact.join("/")
     end
 
     def module_path_from(filename, mapping)

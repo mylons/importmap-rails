@@ -38,6 +38,7 @@ class ImportmapTest < ActiveSupport::TestCase
   test "directory pin mounted under matching subdir maps all files" do
     assert_match %r|assets/controllers/goodbye_controller-.*\.js|, generate_importmap_json["imports"]["controllers/goodbye_controller"]
     assert_match %r|assets/controllers/utilities/md5_controller-.*\.js|, generate_importmap_json["imports"]["controllers/utilities/md5_controller"]
+    assert_match %r|assets/controllers/utilities/sha256_controller_index-.*\.js|, generate_importmap_json["imports"]["controllers/utilities/sha256_controller_index"]
   end
 
   test "directory pin mounted under matching subdir maps index as root" do

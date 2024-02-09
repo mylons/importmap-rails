@@ -75,9 +75,7 @@ class Importmap::Commands < Thor
 
   desc "outdated", "Check for outdated packages"
   def outdated
-    outdated_packages = npm.outdated_packages
-
-    if outdated_packages.any?
+    if (outdated_packages = npm.outdated_packages).any?
       table = [["Package", "Current", "Latest"]]
       outdated_packages.each { |p| table << [p.name, p.current_version, p.latest_version || p.error] }
 
@@ -86,6 +84,15 @@ class Importmap::Commands < Thor
       puts "  #{outdated_packages.size} outdated #{packages} found"
 
       exit 1
+    else
+      puts "No outdated packages found"
+    end
+  end
+
+  desc "update", "Update outdated package pins"
+  def update
+    if (outdated_packages = npm.outdated_packages).any?
+      pin outdated_packages.map(&:name)
     else
       puts "No outdated packages found"
     end
@@ -121,14 +128,13 @@ class Importmap::Commands < Thor
         row.each_with_index.map{ |iterand, index| [lengths[index] || 0, iterand.to_s.length].max }
       end
 
-      puts head = "+" + (column_sizes.map { |s| "-" * (s + 2) }.join('+')) + '+'
+      divider = "|" + (column_sizes.map { |s| "-" * (s + 2) }.join('|')) + '|'
       array.each_with_index do |row, row_number|
         row = row.fill(nil, row.size..(column_sizes.size - 1))
         row = row.each_with_index.map { |v, i| v.to_s + " " * (column_sizes[i] - v.to_s.length) }
         puts "| " + row.join(" | ") + " |"
-        puts head if row_number == 0
+        puts divider if row_number == 0
       end
-      puts head
     end
 end
 

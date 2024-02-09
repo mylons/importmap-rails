@@ -16,6 +16,15 @@ Importmap for Rails is automatically included in Rails 7+ for new applications, 
 
 Note: In order to use JavaScript from Rails frameworks like Action Cable, Action Text, and Active Storage, you must be running Rails 7.0+. This was the first version that shipped with ESM compatible builds of these libraries.
 
+You can pin those libraries manually by relying on the compiled versions included in Rails like this:
+
+```ruby
+pin "@rails/actioncable", to: "actioncable.esm.js"
+pin "@rails/activestorage", to: "activestorage.esm.js"
+pin "@rails/actiontext", to: "actiontext.esm.js"
+pin "trix"
+```
+
 ## How do importmaps work?
 
 At their core, importmaps are essentially a string substitution for what are referred to as "bare module specifiers". A "bare module specifier" looks like this: `import React from "react"`. This is not compatible with the ES Module loader spec. Instead, to be ESM compatible, you must provide 1 of the 3 following types of specifiers:
@@ -108,27 +117,27 @@ The packages are downloaded to `vendor/javascript`, which you can check into you
 If you later wish to remove a downloaded pin:
 
 ```bash
-./bin/importmap unpin react --download
+./bin/importmap unpin react
 Unpinning and removing "react"
 Unpinning and removing "object-assign"
 ```
 
 ## Preloading pinned modules
 
-To avoid the waterfall effect where the browser has to load one file after another before it can get to the deepest nested import, importmap-rails uses [modulepreload links](https://developers.google.com/web/updates/2017/12/modulepreload) by default. If you don't want to preload a dependencies, because it'you want to load it on-demand for efficiency, pinned modules can prevent preloading by appending `preload: false` to the pin.
+To avoid the waterfall effect where the browser has to load one file after another before it can get to the deepest nested import, importmap-rails uses [modulepreload links](https://developers.google.com/web/updates/2017/12/modulepreload) by default. If you don't want to preload a dependency, because you want to load it on-demand for efficiency, append `preload: false` to the pin.
 
 Example:
 
 ```ruby
 # config/importmap.rb
-pin "@github/hotkey", to: "vendor/javascript/@github--hotkey.js"
-pin "md5", to: "vendor/javascript/md5.js", preload: false
+pin "@github/hotkey", to: "@github--hotkey.js" # file lives in vendor/javascript/@github--hotkey.js
+pin "md5", preload: false # file lives in vendor/javascript/md5.js
 
 # app/views/layouts/application.html.erb
 <%= javascript_importmap_tags %>
 
 # will include the following link before the importmap is setup:
-<link rel="modulepreload" href="/assets/javascripts/@github--hotkey.js">
+<link rel="modulepreload" href="/assets/javascript/@github--hotkey.js">
 ...
 ```
 
